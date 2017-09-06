@@ -4,11 +4,13 @@
   hosts: all
   sudo: yes
   roles:
-    - { role: geerlingguy.repo-epel }
+    - { role: adipriyantobpn.repo-epel }
   tasks:
     - yum: name=python-keyczar state=latest
     - service: name=iptables state=stopped enabled=no
     - lineinfile: state=present create=yes dest=/etc/sudoers.d/888-dont-requiretty line="Defaults !requiretty" backup=yes
+    - selinux:
+         state: disabled
 
 - name: Apply common configuration to all target nodes
   hosts: all

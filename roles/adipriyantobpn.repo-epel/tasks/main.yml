@@ -1,0 +1,36 @@
+---
+# tasks file for adipriyantobpn.repo-epel
+- block:
+
+  - name: include yum repository variable file
+    include_vars: "repo-{{ repo_location }}.yml"
+
+  - name: install EPEL yum repository
+    yum:
+      name: "{{ epel_repoinstaller_url }}"
+      state: present
+    register: epel_install_result
+    until: '"failed" not in epel_install_result'
+    retries: 5
+    delay: 10
+
+  - name: import EPEL GPG key
+    rpm_key:
+      key: "{{ epel_gpgkey_url.replace('file://', '') }}"
+      state: present
+    ignore_errors: "{{ ansible_check_mode }}"
+
+  - name: configure EPEL yum repository
+    yum_repository:
+      name: "{{ item.key.lower() }}"
+      description: "Extra Packages for Enterprise Linux $releasever - $basearch"
+      mirrorlist: "{{ item.value.mirrorlist | default(omit) }}"
+      failovermethod: priority
+      baseurl: "{{ item.value.baseurl | default(omit) }}"
+      gpgkey: "{{ epel_gpgkey_url }}"
+      gpgcheck: yes
+      enabled: "{{ item.value.enabled }}"
+      file: "{{ item.value.file }}"
+      state: present
+    with_dict: "{{ epel_repo }}"
+  become: True

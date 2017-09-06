@@ -1,0 +1,6 @@
+---
+# defaults file for adipriyantobpn.repo-epel
+
+repo_location:              indonesia   # available options: international, indonesia, klog, vagrant
+vagrant_repo_base_dir:      "file:///vagrantshare/repo/"
+epel_enabled:               yes
